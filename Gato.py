@@ -1,4 +1,8 @@
 import random
+import socket
+HOST = "127.0.0.1"
+PORT = 65432
+buffer_size = 1024
 
 
 class Gato:
@@ -78,31 +82,42 @@ def decode(cadena):
         aux = []
     return aux
 
+with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as TCPServerSocket:
+    TCPServerSocket.bind((HOST, PORT))
+    TCPServerSocket.listen()
+    print("Esperando jugadores")
+    Client_conn, Client_addr = TCPServerSocket.accept()
 
-print("Juego de Gato\n Seleccione la dificultad:\n1) 3x3\n2) 5x5")
+    with Client_conn:
+        print("Conectado a", Client_addr)
 
-tam = int(input())
+        while True:
+            print("Esperando a recibir datos... ")
+            tam = 0
+            while not(tam is 1 or tam is 2):
+                tam = int(Client_conn.recv(buffer_size))
 
-if tam == 2:
-    tam = 5
-else:
-    tam = 3
+            if tam == 2:
+                tam = 5
+            else:
+                tam = 3
 
-juego = Gato(tam)
-jugador = random.randint(1, 2)
-noWin = True
+            juego = Gato(tam)
+            jugador = random.randint(1, 2)
+            noWin = True
 
-while noWin:
-    novalido = True
-    while novalido:
-        print("Turno del jugador %i" % jugador)
-        x = input()
-        tiro = decode(x)
-        if len(tiro) == 2:
-            novalido = juego.validar(tiro)
-        else:
-            novalido = True
+            while noWin:
+                novalido = True
+                while novalido:
+                    #print("Turno del jugador %i" % jugador)
 
-    noWin = not (juego.tirar(jugador, tiro) == jugador)
-    jugador = cambiarjugador(jugador)
-    juego.imprimir()
+                    x = Client_conn.recv(buffer_size)
+                    tiro = decode(x)
+                    if len(tiro) == 2:
+                        novalido = juego.validar(tiro)
+                    else:
+                        novalido = True
+
+                noWin = not (juego.tirar(jugador, tiro) == jugador)
+                jugador = cambiarjugador(jugador)
+                juego.imprimir()
