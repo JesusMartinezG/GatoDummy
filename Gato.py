@@ -2,19 +2,24 @@ import random
 
 
 class Gato:
-    tablero = None
-    turno = 0
 
-    def __init__(self, siz):
+    def __init__(self, siz): # Crea el tablero con el tamaño indicado
         self.tam = siz
         self.tablero = [[0 for x in range(siz)] for y in range(siz)]  # Crea un tablero de tam x tam lleno de ceros
+        self.turno = 0
 
-    def tirar(self, jg, coord):
-        if self.tablero[coord[0]][coord[1]] == 0:
-            self.tablero[coord[0]][coord[1]] = jg
-            return self.win(jg)  # Retorna el numero del jugador si es que gana con su tiro, si no retorna 0
+    def cambiarTurno(self): # Cambia entre los jugadores ( solo dos para este caso )
+        if self.turno == 1:
+            self.turno = 2
         else:
-            return -1  # Retorna -1 cuando el tiro no es válido
+            self.turno = 1
+
+    def tirar(self, jg, coord): # Plasma el simbolo del jugador indicado en las coordeneadas ingresadas
+        if self.tablero[coord[0]][coord[1]] == 0: # Que la casilla esté vacía
+            self.tablero[coord[0]][coord[1]] = jg # Pone el simbolo
+            return self.win(jg)  # Revisa la condición ganar
+        else:
+            return -1  # Retorna -1 cuando la casilla ya está ocupada
 
     def imprimir(self):
         for x in range(self.tam):
@@ -22,7 +27,7 @@ class Gato:
                 print("%i \t" % self.tablero[x][y], end="", flush=True)
             print("\n")
 
-    def win(self, jg):
+    def win(self, jg): # Evalúa si el jugador indicado ha ganado
         winner = False
 
         for x in range(self.tam):
@@ -59,7 +64,7 @@ class Gato:
 
         return 0
 
-    def validar(self, arr):
+    def validar(self, arr): # Revisa que las coordenadas introducidas sean validas para el tamaño del tablero
         return arr[0] < 0 or arr[1] < 0 or arr[0] >= self.tam or arr[1] >= self.tam
 
 
@@ -70,7 +75,7 @@ def cambiarjugador(jg):
         return 1
 
 
-def decode(cadena):
+def decode(cadena): # Para obtener las coordenadas introducidas
     aux = cadena.split(',')
     if len(aux) is 2:
         aux = [int(x) for x in aux]  # convierte la cadena en un arreglo de enteros
@@ -78,31 +83,35 @@ def decode(cadena):
         aux = []
     return aux
 
+def main():
+    print("Juego de Gato\n Seleccione la dificultad:\n1) 3x3\n2) 5x5")
 
-print("Juego de Gato\n Seleccione la dificultad:\n1) 3x3\n2) 5x5")
+    tam = int(input()) # Ingresar la dificultad
 
-tam = int(input())
+    if tam == 2:
+        tam = 5
+    else:
+        tam = 3
 
-if tam == 2:
-    tam = 5
-else:
-    tam = 3
+    # Crear una instancia del juego de gato
+    juego = Gato(tam)
+    jugador = 1 #random.randint(1, 2)
+    noWin = True
 
-juego = Gato(tam)
-jugador = random.randint(1, 2)
-noWin = True
+    while noWin: # Ciclo de intercambio de tiros
+        novalido = True
+        while novalido:
+            print("Turno del jugador %i" % jugador)
+            x = input()
+            tiro = decode(x)
+            if len(tiro) == 2:
+                novalido = juego.validar(tiro)
+            else:
+                novalido = True
 
-while noWin:
-    novalido = True
-    while novalido:
-        print("Turno del jugador %i" % jugador)
-        x = input()
-        tiro = decode(x)
-        if len(tiro) == 2:
-            novalido = juego.validar(tiro)
-        else:
-            novalido = True
+        noWin = not (juego.tirar(jugador, tiro) == jugador)
+        jugador = cambiarjugador(jugador)
+        juego.imprimir()
 
-    noWin = not (juego.tirar(jugador, tiro) == jugador)
-    jugador = cambiarjugador(jugador)
-    juego.imprimir()
+if __name__ == '__main__':
+    main()
