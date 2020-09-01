@@ -1,9 +1,10 @@
 import random
-
+import time
 
 class Gato:
 
     def __init__(self, siz): # Crea el tablero con el tamaño indicado
+        self.tiempoInicio = time.time()
         self.tam = siz
         self.tablero = [[0 for x in range(siz)] for y in range(siz)]  # Crea un tablero de tam x tam lleno de ceros
         self.turno = 0
@@ -37,6 +38,7 @@ class Gato:
             winner = winner or aux
 
         if winner:
+            self.tiempoFin = time.time()
             return jg
 
         for y in range(self.tam):
@@ -46,6 +48,7 @@ class Gato:
             winner = winner or aux
 
         if winner:
+            self.tiempoFin = time.time()
             return jg
 
         aux = True
@@ -53,6 +56,7 @@ class Gato:
             aux = aux and (self.tablero[x][x] == jg)  # Es Diagonal \
 
         if aux:
+            self.tiempoFin = time.time()
             return jg
 
         aux = True
@@ -60,13 +64,13 @@ class Gato:
             aux = aux and (self.tablero[x][self.tam - 1 - x] == jg)  # es diagonal /
 
         if aux:
+            self.tiempoFin = time.time()
             return jg
 
         return 0
 
     def validar(self, arr): # Revisa que las coordenadas introducidas sean validas para el tamaño del tablero
         return arr[0] < 0 or arr[1] < 0 or arr[0] >= self.tam or arr[1] >= self.tam
-
 
 def cambiarjugador(jg):
     if jg == 1:
@@ -112,6 +116,7 @@ def main():
         noWin = not (juego.tirar(jugador, tiro) == jugador)
         jugador = cambiarjugador(jugador)
         juego.imprimir()
+    print('Duración del juego: {:.2f}'.format(juego.tiempoFin - juego.tiempoInicio) + ' segundos' )
 
 if __name__ == '__main__':
     main()
