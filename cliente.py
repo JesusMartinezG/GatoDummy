@@ -23,6 +23,11 @@ def imprimirTablero(s, tam):
             print("\n")
         print("{} \t".format(s[i]), end="", flush=True)
 
+def recibir(sock):
+    s = sock.recv(512)
+    s = s.decode('utf-8')
+    return s
+
 def main():
     # Argumentos de ejecución
     if len(sys.argv) != 3:
@@ -58,8 +63,8 @@ def main():
                     enviarTiro(SocketCliente, misimbolo, tiro)          # enviar tiro
                 else:
                     print('Turno del CPU')
-            elif codigo[0] == 1: # El juego termina
-                print('{} gana')
+            elif codigo[0] == '1': # El juego termina
+                print('{} gana'.format(codigo[1]))
                 continuar = False
             else: # Error
                 if codigo[1] == misimbolo:
@@ -67,7 +72,7 @@ def main():
                 else:
                     pass
 
-        duracion = recibir(SocketCliente, 256)  # Recibir duración del juego
+        duracion = recibir(SocketCliente)  # Recibir duración del juego
         print('El juego ha durado ' + duracion + 'segundos')
         # FIN
 

@@ -18,7 +18,7 @@ class Gato:
         self.numJugadores = 2
 
     def cambiarTurno(self):  # Cambia entre los turnos
-        if self.turno < self.numJugadores:
+        if self.turno < self.numJugadores-1:
             self.turno+=1
         else:
             self.turno = 0
@@ -32,8 +32,8 @@ class Gato:
         else:
             if self.numTiros == self.tiros_maximos:         # Si ya no hay más casillas que llenar
                 return '1/'                                 # Empate
-            else:
-                self.cambiarTurno()                         # Solo si el juego continua se cambia el turno y no hubo errores
+            else:                                           # Solo si el juego continua y no hubo errores
+                self.cambiarTurno()
                 return '0'+self.simbolos[self.turno]        # Sigue jugando
 
     def imprimir(self):
@@ -97,7 +97,8 @@ class Gato:
         while not self.validar(coord):                                                  # Revisa que las casilla esté vacía
             coord = (random.randint(0, self.tam - 1), random.randint(0, self.tam - 1))  # Si no está vacía vuelve a generar
         print('CPU tira: ', coord)
-        return self.tirar('o', coord)                                                  # Realiza el tiro y retorna la cadena de control
+        c = self.tirar('o', coord)                                                  # Realiza el tiro y retorna la cadena de control
+        return c
 
     def enviarTablero(self, sock, control):
         s = ''.join([''.join(i) for i in self.tablero])    # Convierte la matriz en una cadena de caracteres consegutivos
@@ -168,6 +169,7 @@ def main():
                     print('Turno del cliente')
                     r = recibirTiro(client_conn, juego)                         # Analiza la cadena del cliente
                     if r[0] == '0':
+                        #juego.cambiarTurno()
                         juego.enviarTablero(client_conn, r)
                         print('Tiro registrado, el juego continúa')
                     elif r[0] =='1':
@@ -177,11 +179,13 @@ def main():
                     else:
                         juego.enviarTablero(client_conn, r)                     # Error en la cadena recibida
                         print('Error en los datos recibidos')
+                        break
 
                 else:  # Turno del cpu
                     print('Turno del CPU')
                     if r[0] == '0':
-                        juego.cpu()
+                        r = juego.cpu()
+                        #juego.cambiarTurno()
                         print('Tiro de CPU registrado')
                         juego.enviarTablero(client_conn, r)
                         print('Tiro registrado, el juego continúa')
@@ -189,7 +193,7 @@ def main():
                         print('{} gana'.format(r[1]))
                         juego.enviarTablero(client_conn, r)  # Envía tablero al cliente
                         continuar = False
-
+            print('El juego ha terminado')
             enviar(client_conn, '{:.2f}'.format(juego.tiempoFin - juego.tiempoInicio))  # Envía duración del juego
 
 
