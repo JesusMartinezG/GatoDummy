@@ -23,10 +23,6 @@ def imprimirTablero(s, tam):
             print("\n")
         print("{} \t".format(s[i]), end="", flush=True)
 
-def recibir(sock):
-    s = sock.recv(512)
-    s = s.decode('utf-8')
-    return s
 
 def main():
     # Argumentos de ejecución
@@ -69,10 +65,12 @@ def main():
             else: # Error
                 if codigo[1] == misimbolo:
                     print('Error en la cadena enviada, intente de nuevo')
+                    tiro = input()
+                    enviarTiro(SocketCliente, misimbolo, tiro)
                 else:
                     pass
 
-        duracion = recibir(SocketCliente)  # Recibir duración del juego
+        duracion = SocketCliente.recv(512).decode("utf-8")  # Recibir duración del juego
         print('El juego ha durado ' + duracion + 'segundos')
         # FIN
 
