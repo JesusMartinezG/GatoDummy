@@ -179,7 +179,6 @@ def main():
                     else:
                         juego.enviarTablero(client_conn, r)                     # Error en la cadena recibida
                         print('Error en los datos recibidos')
-                        break
 
                 else:  # Turno del cpu
                     print('Turno del CPU')
